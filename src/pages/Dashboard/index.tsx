@@ -47,6 +47,10 @@ const Dashboard: React.FC = () => {
     loadTransactions();
   }, []);
 
+  const formatedIncome = formatValue(Number(balance.income));
+  const formatedOutcome = formatValue(Number(balance.outcome));
+  const formatedTotal = formatValue(Number(balance.total));
+
   return (
     <>
       <Header />
@@ -57,21 +61,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">{balance.income}</h1>
+            <h1 data-testid="balance-income">{formatedIncome}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
+            <h1 data-testid="balance-outcome">{formatedOutcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">{balance.total}</h1>
+            <h1 data-testid="balance-total">{formatedTotal}</h1>
           </Card>
         </CardContainer>
         <TableContainer>
