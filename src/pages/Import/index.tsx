@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import filesize from 'filesize';
 
@@ -18,9 +18,17 @@ interface FileProps {
   readableSize: string;
 }
 
+interface LocationState {
+  fromLink?: boolean;
+}
+
 const Import: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
   const history = useHistory();
+  const location = useLocation();
+  const locationState = location.state as LocationState;
+
+  if (!locationState?.fromLink) history.push('/');
 
   async function handleUpload(): Promise<void> {
     // const data = new FormData();
