@@ -11,14 +11,13 @@ import Header from '../../components/Header';
 import formatValue from '../../utils/formatValue';
 
 import { Container, CardContainer, Card, TableContainer } from './styles';
-import { parseJsonConfigFileContent } from 'typescript';
 
 interface Transaction {
   id: string;
   title: string;
   value: number;
-  formattedValue: string;
-  formattedDate: string;
+  formatedValue: string;
+  formatedDate: string;
   type: 'income' | 'outcome';
   category: { title: string };
   created_at: Date;
@@ -29,6 +28,11 @@ interface Balance {
   outcome: string;
   total: string;
 }
+interface BalanceResponseData {
+  income: number;
+  outcome: number;
+  total: number;
+}
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -36,20 +40,34 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      // TODO
       const transactionsResponse = await api.get('transactions');
+
       const transactionsData = transactionsResponse.data.transactions;
-      const balanceData = transactionsResponse.data.balance;
-      setTransactions(transactionsData);
-      setBalance(balanceData);
+      const balanceData: BalanceResponseData =
+        transactionsResponse.data.balance;
+
+      const formatedTransactions = transactionsData.map(
+        (transaction: Transaction) => ({
+          ...transaction,
+          formatedValue: formatValue(transaction.value),
+          formatedDate: new Date(transaction.created_at).toLocaleDateString(
+            'pt-br',
+          ),
+        }),
+      );
+
+      const formatedBalance: Balance = {
+        income: formatValue(balanceData.income),
+        outcome: formatValue(balanceData.outcome),
+        total: formatValue(balanceData.total),
+      };
+
+      setBalance(formatedBalance);
+      setTransactions(formatedTransactions);
     }
 
     loadTransactions();
   }, []);
-
-  const formatedIncome = formatValue(Number(balance.income));
-  const formatedOutcome = formatValue(Number(balance.outcome));
-  const formatedTotal = formatValue(Number(balance.total));
 
   return (
     <>
@@ -61,21 +79,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">{formatedIncome}</h1>
+            <h1 data-testid="balance-income">{balance.income}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">{formatedOutcome}</h1>
+            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">{formatedTotal}</h1>
+            <h1 data-testid="balance-total">{balance.total}</h1>
           </Card>
         </CardContainer>
         <TableContainer>
@@ -95,10 +113,10 @@ const Dashboard: React.FC = () => {
                   <td className="title">{transaction.title}</td>
                   <td className={transaction.type}>
                     {transaction.type === 'outcome' && '- '}
-                    {formatValue(transaction.value)}
+                    {transaction.formatedValue}
                   </td>
                   <td>{transaction.category.title}</td>
-                  <td>{transaction.created_at}</td>
+                  <td>{transaction.formatedDate}</td>
                 </tr>
               ))}
             </tbody>

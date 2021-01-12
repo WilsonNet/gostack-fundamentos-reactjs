@@ -31,7 +31,6 @@ const Import: React.FC = () => {
   if (!locationState?.fromLink) history.push('/');
 
   async function handleUpload(): Promise<void> {
-    const fileReader = new FileReader();
     const data = new FormData();
     uploadedFiles.forEach(uploadedFile => {
       data.append('file', URL.createObjectURL(uploadedFile.file));
@@ -39,6 +38,7 @@ const Import: React.FC = () => {
     try {
       await api.post('/transactions/import', data);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err.response.error);
     }
   }
